@@ -41,8 +41,7 @@ public class HttpClientConnection implements Runnable {
 
             while (true) {
                 // read from client (browser)
-                // retrieve first line (eg: GET /index.html HTTP/1.1)
-                String req = br.readLine();
+                String req = br.readLine(); // eg. GET /index.html HTTP/1.1
                 System.out.printf("Request from client: %s\n", req);
                 // break the first line by <space> and store in String array
                 // index 0 = request method (GET / POST / PUT / DELETE...)
@@ -71,7 +70,7 @@ public class HttpClientConnection implements Runnable {
                 }
 
                 // =====CHECKPOINTS=====
-                // System.out.println("RESOURCE: " + resource);
+                System.out.println("RESOURCE: " + resource);
                 // System.out.println("DIRECTORY" + directory);
                 // =====CHECKPOINTS=====
 
@@ -83,13 +82,14 @@ public class HttpClientConnection implements Runnable {
                     String[] fileList = file.list();
 
                     // =====CHECKPOINTS=====
-                    // System.out.println(Arrays.toString(fileList));
+                    System.out.println(Arrays.toString(fileList));
                     // =====CHECKPOINTS=====
 
                     // if exists, print out result and proceed
                     for (int j = 0; j < fileList.length; j++) {
                         String resCompare = resource.replace("/", "");
-                        if (resCompare.equals(fileList[i])) {
+                        System.out.println(fileList[j]);
+                        if (resCompare.equals(fileList[j])) {
                             System.out.println("Resource exists");
                             resourceExists = true;
                             resourcePath = directory.get(i) + resource;
@@ -100,7 +100,7 @@ public class HttpClientConnection implements Runnable {
                 }
                 // if does not exists, send the response back to client by os.write()
                 if (resourceExists == false) {
-                    // System.out.println("resource doesn't exists");
+                    System.out.println("resource doesn't exists");
                     os.write("HTTP/1.1 404 Not Found\r\n".getBytes());
                     os.write("\r\n".getBytes());
                     os.write((resource + " not found\r\n").getBytes());
@@ -123,15 +123,15 @@ public class HttpClientConnection implements Runnable {
                 // System.out.println("EXT: " + ext);
                 // =====CHECKPOINTS=====
 
-                if (ext.equals("html")) {
+                if (ext.equals("html") || ext.equals("css")) {
                     File file = new File(resourcePath);
                     Scanner scanner = new Scanner(file);
-                    String html = scanner.useDelimiter("\\Z").next();
+                    String content = scanner.useDelimiter("\\Z").next();
                     scanner.close();
-                    System.out.println(html);
+                    // System.out.println(content);
                     os.write("HTTP/1.1 200 OK\r\n".getBytes());
                     os.write("\r\n".getBytes());
-                    os.write(html.getBytes());
+                    os.write(content.getBytes());
                     os.flush();
                     break;
                 } else if (ext.equals("png")) {
